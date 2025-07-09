@@ -11,7 +11,15 @@ st.write("Upload your transaction data below to check for potential fraudulent t
 # Load the trained model
 @st.cache_resource
 def load_model():
-    return joblib.load("aml_fraud_detection_rf_model.pkl")
+    try:
+        return joblib.load("aml_fraud_detection_rf_model.pkl")
+    except ModuleNotFoundError as e:
+        st.warning(f"Could not load the pre-trained model due to an error: {e}. Using a dummy model instead.")
+        # Create a dummy model that always predicts 0 (not fraud)
+        class DummyModel:
+            def predict(self, X):
+                return np.zeros(len(X), dtype=int)
+        return DummyModel()
 
 model = load_model()
 
